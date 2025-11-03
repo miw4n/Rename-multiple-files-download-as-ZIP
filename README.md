@@ -17,3 +17,6 @@ Features:
 - Find & replace text in filenames
 - Option to lowercase all filenames
 - Fully client-side, no server required
+- 
+Licence
+Ce projet est libre, vous pouvez le partager et le modifier.

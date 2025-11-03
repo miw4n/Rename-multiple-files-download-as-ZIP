@@ -12,7 +12,7 @@ Fonctionnalités :
 - Option de tout mettre en minuscules
 - 100 % côté client, aucun serveur nécessaire
 
-**Essayez-le maintenant sur GitHub Pages :** [[[ ]([https://username.github.io/mon-site/](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/))](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/)](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/)
+**Essayez-le maintenant sur GitHub Pages :** [[ ]([https://username.github.io/mon-site/](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/))](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/)
 
 
 ---

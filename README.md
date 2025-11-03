@@ -1,15 +1,24 @@
+# 🔥 Multi File Renamer & ZIP
+
+![Screenshot](screenshot.gif)  <!-- remplace par ton GIF ou image -->
+
 ## 🇫🇷 Français
-Cet outil permet de renommer facilement plusieurs fichiers en même temps et de les télécharger en ZIP.  
+**Renommez plusieurs fichiers en un clic et téléchargez-les en ZIP !**  
 Fonctionnalités :
 - Templates de renommage avec `{num}` et `{name}`
 - Numérotation automatique avec padding
 - Ajout de préfixe/suffixe
 - Remplacement de texte dans les noms de fichiers
 - Option de tout mettre en minuscules
-- Fonctionne entièrement côté client, aucun serveur nécessaire
+- 100 % côté client, aucun serveur nécessaire
+
+**Essayez-le maintenant sur GitHub Pages :** [Lien vers votre site]([https://username.github.io/mon-site/](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/))
+
+
+---
 
 ## 🇬🇧 English
-This tool lets you easily rename multiple files at once and download them as a ZIP.  
+**Rename multiple files in one click and download them as ZIP!**  
 Features:
 - Rename templates with `{num}` and `{name}`
 - Automatic numbering with zero-padding
@@ -17,6 +26,5 @@ Features:
 - Find & replace text in filenames
 - Option to lowercase all filenames
 - Fully client-side, no server required
-- 
-Licence : 
-Ce projet est libre, vous pouvez le partager et le modifier.
+
+**Try it now on GitHub Pages:** [Your site link]([https://username.github.io/mon-site/](https://miw4n.github.io/Rename-multiple-files-download-as-ZIP/))

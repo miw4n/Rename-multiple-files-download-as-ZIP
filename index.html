@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Renommer + Zip — Outil client-side</title>
+  <style>
+  :root {
+  --bg: #0a0f1c;
+  --card: #111827;
+  --accent: #60a5fa;
+  --accent2: #8b5cf6;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --glass: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.08);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  background: radial-gradient(circle at top left, #0b1220, #0a0f1c 80%);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 20px;
+  position: relative;
+  animation: fadeIn 0.6s ease;
+}
+
+#langSelect {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--glass);
+  color: var(--text);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  transition: 0.3s;
+}
+#langSelect:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: white;
+  text-shadow: 0 0 15px rgba(96,165,250,0.3);
+}
+p.lead {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+}
+
+.file-drop {
+  margin: 12px 0;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--glass);
+  border: 2px dashed rgba(255,255,255,0.1);
+  text-align: center;
+  transition: 0.3s;
+}
+.file-drop.dragover {
+  background: rgba(96,165,250,0.1);
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.btn {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(96,165,250,0.3);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(139,92,246,0.35);
+}
+
+input[type=text],
+input[type=number] {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  transition: 0.25s;
+}
+input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 8px rgba(96,165,250,0.3);
+}
+
+.progress {
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width: 0;
+  transition: width 0.4s ease;
+}
+
+.files-list {
+  margin-top: 12px;
+}
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: 0.2s;
+}
+.file-item:hover {
+  background: rgba(96,165,250,0.08);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <select id="langSelect">
+      <option value="fr" selected>🇫🇷 Français</option>
+      <option value="en">🇬🇧 English</option>
+    </select>
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="miw4n" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+    <h1 id="title">Renommer plusieurs fichiers et télécharger en ZIP</h1>
+    <p id="lead" class="lead">Choisissez des fichiers, appliquez un template de renommage puis téléchargez tout en .zip (client-side).</p>
+
+    <div class="explanation" id="explanation">
+      <h3>💡 Comment ça marche ?</h3>
+      <ul>
+        <li><strong>{num}</strong> : numéro automatique du fichier (01, 02, 03...).</li>
+        <li><strong>{name}</strong> : nom original du fichier, sans l’extension.</li>
+      </ul>
+      <p>Par exemple : <em>IMG_001.jpg</em> → <strong>Vacances_01_IMG_001.jpg</strong></p>
+      <p>Vous pouvez aussi : modifier la numérotation, ajouter un préfixe ou suffixe, remplacer du texte, tout mettre en minuscules, etc.</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <input id="fileInput" type="file" multiple style="display:none" />
+        <button id="browseBtn" class="btn">Parcourir les fichiers</button>
+        <div style="flex:1"></div>
+        <button id="zipBtn" class="btn" disabled>Télécharger en ZIP</button>
+      </div>
+
+      <div class="file-drop" id="dropArea">Ou glissez-déposez les fichiers ici</div>
+
+      <div class="controls">
+        <div>
+          <label id="lblTemplate">Template de renommage</label>
+          <input id="template" type="text" value="MonFichier_{num}" placeholder="Ex: Photo_{num}" />
+          <div class="small" id="hintTemplate">Utilisez {num} pour le numéro et {name} pour le nom d'origine.</div>
+        </div>
+
+        <div>
+          <label id="lblNum">Options de numérotation</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="startIndex" type="number" value="1" min="0" style="width:80px" />
+            <input id="padding" type="number" value="0" min="0" style="width:80px" />
+            <label class="small" style="margin-left:6px">(0 = auto)</label>
+          </div>
+          <div style="margin-top:8px" class="options">
+            <label class="muted-pill"><input id="keepExt" type="checkbox" checked /> <span id="optExt">Garder l'extension</span></label>
+            <label class="muted-pill"><input id="autoPad" type="checkbox" checked /> <span id="optPad">Auto padding</span></label>
+            <label class="muted-pill"><input id="lowercase" type="checkbox" /> <span id="optLower">Tout en minuscules</span></label>
+          </div>
+        </div>
+
+        <div>
+          <label id="lblPrefix">Préfixe / Suffixe</label>
+          <input id="prefix" type="text" placeholder="Préfixe (optionnel)" />
+          <input id="suffix" type="text" placeholder="Suffixe (optionnel)" style="margin-top:6px" />
+        </div>
+
+        <div>
+          <label id="lblReplace">Remplacer dans le nom</label>
+          <input id="find" type="text" placeholder="chercher" />
+          <input id="replace" type="text" placeholder="remplacer par" style="margin-top:6px" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+        <button id="applyBtn" class="btn" disabled>Appliquer le renommage</button>
+        <div style="flex:1"></div>
+        <div class="small"><span id="lblFiles">Fichiers sélectionnés:</span> <span id="count">0</span></div>
+      </div>
+
+      <div class="files-list" id="filesList"></div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+        <div class="progress" style="flex:1"><i id="progressBar"></i></div>
+        <div id="status" class="small" style="min-width:150px;text-align:right">Prêt</div>
+      </div>
+
+      <footer id="footerHint">Astuce: utilisez {num} dans le template. Essayez aussi {name} pour garder le nom de base.</footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script>
+    // UI refs
+    const fileInput = document.getElementById('fileInput');
+    const browseBtn = document.getElementById('browseBtn');
+    const zipBtn = document.getElementById('zipBtn');
+    const dropArea = document.getElementById('dropArea');
+    const filesList = document.getElementById('filesList');
+    const countEl = document.getElementById('count');
+    const applyBtn = document.getElementById('applyBtn');
+    const templateInput = document.getElementById('template');
+    const startIndexInput = document.getElementById('startIndex');
+    const paddingInput = document.getElementById('padding');
+    const keepExtInput = document.getElementById('keepExt');
+    const autoPadInput = document.getElementById('autoPad');
+    const prefixInput = document.getElementById('prefix');
+    const suffixInput = document.getElementById('suffix');
+    const findInput = document.getElementById('find');
+    const replaceInput = document.getElementById('replace');
+    const progressBar = document.getElementById('progressBar');
+    const status = document.getElementById('status');
+
+    let files = []; // {file, name, ext, newName}
+
+    function resetState(){
+      files = [];
+      renderList();
+      applyBtn.disabled = true;
+      zipBtn.disabled = true;
+      countEl.textContent = 0;
+    }
+
+    function handleFiles(selected){
+      for(const f of selected){
+        // skip directories (webkitdirectory unsupported here) but keep files
+        const {name} = f;
+        const dot = name.lastIndexOf('.');
+        const ext = dot === -1 ? '' : name.slice(dot);
+        const base = dot === -1 ? name : name.slice(0,dot);
+        files.push({file: f, name: base, ext: ext, newName: name});
+      }
+      renderList();
+      applyBtn.disabled = files.length === 0;
+      zipBtn.disabled = files.length === 0;
+      countEl.textContent = files.length;
+    }
+
+    browseBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', (e)=> handleFiles(e.target.files));
+
+    // drag & drop
+    ;['dragenter','dragover'].forEach(evt=> dropArea.addEventListener(evt, e=>{e.preventDefault();dropArea.style.borderColor='#8ab4ff'}));
+    ;['dragleave','drop'].forEach(evt=> dropArea.addEventListener(evt, e=>{e.preventDefault();dropArea.style.borderColor='rgba(255,255,255,0.04)'}));
+    dropArea.addEventListener('drop', (e)=>{
+      const dt = e.dataTransfer; if(!dt) return; handleFiles(dt.files);
+    });
+
+    function renderList(){
+      filesList.innerHTML = '';
+      files.forEach((f, i)=>{
+        const el = document.createElement('div'); el.className='file-item';
+        el.innerHTML = `<div style="min-width:0"><div style=\"font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:360px\">${escapeHtml(f.newName)}</div><div class=\"meta\">${escapeHtml(f.name)}${escapeHtml(f.ext)} • ${formatBytes(f.file.size)}</div></div><div style=\"display:flex;gap:8px;align-items:center\"><button data-i=${i} class=\"small-btn\">Modifier</button><button data-del=${i} class=\"small-btn\">Supprimer</button></div>`;
+        filesList.appendChild(el);
+      });
+      // attach small buttons actions
+      filesList.querySelectorAll('button[data-i]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const i = Number(btn.getAttribute('data-i'));
+          const newName = prompt('Nom personnalisé (sans extension)', files[i].name);
+          if(newName!=null){ files[i].name = newName; files[i].newName = files[i].name + files[i].ext; renderList(); }
+        });
+      });
+      filesList.querySelectorAll('button[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const i = Number(btn.getAttribute('data-del'));
+          files.splice(i,1); renderList(); countEl.textContent = files.length; applyBtn.disabled = files.length===0; zipBtn.disabled = files.length===0;
+        });
+      });
+    }
+
+    function applyRenaming(){
+      if(files.length===0) return;
+      const tmpl = templateInput.value || '{num}';
+      const start = Number(startIndexInput.value) || 0;
+      const padManual = Number(paddingInput.value) || 0;
+      const autoPad = autoPadInput.checked;
+      const keepExt = keepExtInput.checked;
+      const lower = document.getElementById('lowercase').checked;
+      const prefix = prefixInput.value || '';
+      const suffix = suffixInput.value || '';
+      const find = findInput.value;
+      const replace = replaceInput.value;
+
+      const totalNums = files.length + Math.max(0, start-1);
+      const autoPadDigits = String(totalNums).length;
+      const pad = padManual>0 ? padManual : (autoPad ? autoPadDigits : 0);
+
+      for(let i=0;i<files.length;i++){
+        const idx = start + i;
+        let num = String(idx).padStart(pad, '0');
+        // replacements
+        let base = files[i].name;
+        if(find) base = base.split(find).join(replace);
+        let out = tmpl.replace(/{num}/g, num).replace(/{name}/g, base);
+        out = prefix + out + suffix;
+        if(lower) out = out.toLowerCase();
+        out = sanitizeFilename(out);
+        files[i].newName = keepExt ? `${out}${files[i].ext}` : out; // if not keep ext, caller may want no ext
+      }
+      renderList();
+      status.textContent = 'Renommage appliqué (aperçu)';
+    }
+
+    applyBtn.addEventListener('click', applyRenaming);
+
+    function createZip(){
+      if(files.length===0) return;
+      applyRenaming(); // ensure latest
+      zipBtn.disabled = true; applyBtn.disabled = true; browseBtn.disabled = true;
+      status.textContent = 'Création du zip...';
+      const zip = new JSZip();
+      const imgFolder = zip.folder('files') || zip;
+      let done = 0;
+      const total = files.length;
+
+      const promises = files.map((f, i)=>{
+        return new Promise((res, rej)=>{
+          const reader = new FileReader();
+          reader.onload = e=>{
+            // write content to zip with newName; if newName has no extension and keepExt false, we still include raw blob name
+            let filename = files[i].newName || files[i].name + files[i].ext;
+            // ensure there is an extension; if user removed ext intentionally we respect it
+            imgFolder.file(filename, e.target.result); done++; updateProgress(done/total); res();
+          };
+          reader.onerror = err=>{ rej(err); };
+          reader.readAsArrayBuffer(files[i].file);
+        });
+      });
+
+      Promise.all(promises).then(()=>{
+        zip.generateAsync({type:'blob'}, metadata=>{
+          updateProgress(metadata.percent/100);
+          status.textContent = `Compression ${Math.round(metadata.percent)}%`;
+        }).then(content=>{
+          saveAs(content, `renommage_${Date.now()}.zip`);
+          status.textContent = 'Téléchargement prêt';
+          progressBar.style.width = '0%';
+          zipBtn.disabled = false; applyBtn.disabled = false; browseBtn.disabled = false;
+        });
+      }).catch(err=>{
+        console.error(err); alert('Erreur lors de la lecture des fichiers'); zipBtn.disabled=false; applyBtn.disabled=false; browseBtn.disabled=false;
+      });
+    }
+
+    zipBtn.addEventListener('click', createZip);
+
+    function updateProgress(ratio){
+      const pct = Math.round(ratio*100);
+      progressBar.style.width = pct + '%';
+    }
+
+    // utilities
+    function sanitizeFilename(name){
+      // remove forbidden characters for filenames on common OS
+      return name.replace(/[\\/:*?"<>|\n\r\t]/g, '_');
+    }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
+    function formatBytes(bytes){ if(bytes===0) return '0 B'; const k=1024; const sizes=['B','KB','MB','GB','TB']; const i=Math.floor(Math.log(bytes)/Math.log(k)); return parseFloat((bytes/Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i]; }
+
+    // start with reset
+    resetState();
+
+    // extra: keyboard shortcut Ctrl+O to open file dialog
+    window.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='o'){ e.preventDefault(); fileInput.click(); } });
+   const translations = {
+      fr: {
+        title: "Renommer plusieurs fichiers et télécharger en ZIP",
+        lead: "Choisissez des fichiers, appliquez un template de renommage puis téléchargez tout en .zip (client-side).",
+        browse: "Parcourir les fichiers",
+        zip: "Télécharger en ZIP",
+        apply: "Appliquer le renommage",
+        ready: "Prêt",
+        drop: "Ou glissez-déposez les fichiers ici",
+        tmplLabel: "Template de renommage",
+        tmplHint: "Utilisez {num} pour le numéro et {name} pour le nom d'origine.",
+        numLabel: "Options de numérotation",
+        optExt: "Garder l'extension",
+        optPad: "Auto padding",
+        optLower: "Tout en minuscules",
+        prefix: "Préfixe / Suffixe",
+        replace: "Remplacer dans le nom",
+        files: "Fichiers sélectionnés:",
+        footer: "Astuce: utilisez {num} et {name} pour garder le nom de base.",
+        explanationTitle: "💡 Comment ça marche ?",
+        explanationText: "Utilisez {num} pour le numéro automatique et {name} pour le nom d'origine sans extension. Exemple : IMG_001.jpg → Vacances_01_IMG_001.jpg. Vous pouvez aussi ajuster la numérotation, ajouter un préfixe/suffixe, remplacer du texte ou tout mettre en minuscules."
+      },
+      en: {
+        title: "Rename multiple files and download as ZIP",
+        lead: "Select files, apply a renaming template, then download all as a .zip (client-side).",
+        browse: "Browse files",
+        zip: "Download ZIP",
+        apply: "Apply renaming",
+        ready: "Ready",
+        drop: "Or drag and drop files here",
+        tmplLabel: "Renaming template",
+        tmplHint: "Use {num} for numbering and {name} for the original name.",
+        numLabel: "Numbering options",
+        optExt: "Keep extension",
+        optPad: "Auto padding",
+        optLower: "Lowercase all",
+        prefix: "Prefix / Suffix",
+        replace: "Find & replace",
+        files: "Files selected:",
+        footer: "Tip: use {num} and {name} in your template.",
+        explanationTitle: "💡 How does it work?",
+        explanationText: "Use {num} for automatic numbering and {name} for the original filename (without extension). Example: IMG_001.jpg → Vacation_01_IMG_001.jpg. You can also adjust numbering, add prefix/suffix, replace text, or lowercase everything."
+      }
+    };
+
+    const langSelect = document.getElementById('langSelect');
+    const t = (id, txt)=> document.getElementById(id).innerHTML = txt;
+
+    langSelect.addEventListener('change', ()=>{
+      const l = translations[langSelect.value];
+      document.documentElement.lang = langSelect.value;
+      t('title', l.title);
+      t('lead', l.lead);
+      t('browseBtn', l.browse);
+      t('zipBtn', l.zip);
+      t('applyBtn', l.apply);
+      t('dropArea', l.drop);
+      t('lblTemplate', l.tmplLabel);
+      t('hintTemplate', l.tmplHint);
+      t('lblNum', l.numLabel);
+      t('optExt', l.optExt);
+      t('optPad', l.optPad);
+      t('optLower', l.optLower);
+      t('lblPrefix', l.prefix);
+      t('lblReplace', l.replace);
+      t('lblFiles', l.files);
+      t('footerHint', l.footer);
+      t('explanation', `<h3>${l.explanationTitle}</h3><p>${l.explanationText}</p>`);
+      document.getElementById('status').textContent = l.ready;
+    });
+  </script>
+</body>
+</html>

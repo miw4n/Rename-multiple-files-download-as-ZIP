@@ -18,5 +18,5 @@ Features:
 - Option to lowercase all filenames
 - Fully client-side, no server required
 - 
-Licence
+Licence : 
 Ce projet est libre, vous pouvez le partager et le modifier.
